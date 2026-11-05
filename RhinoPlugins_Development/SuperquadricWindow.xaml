@@ -1,0 +1,250 @@
+<Window x:Class="RhinoPlugins_Development.SuperquadricWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Create Superquadric（超二次曲面创建）"
+        Width="520" Height="720" MinHeight="420" MinWidth="480"
+        WindowStartupLocation="CenterScreen" ResizeMode="CanResize">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto" Margin="14,12,14,0">
+            <StackPanel>
+                <TextBlock Text="超二次曲面隐式方程（Barr 1981）：" FontWeight="Bold" FontSize="13"/>
+                <TextBlock Text="((|x/a|^(2/ε2) + |y/b|^(2/ε2))^(ε2/ε1) + |z/c|^(2/ε1))^(ε1/2) = 1"
+                           TextWrapping="Wrap" Foreground="#444" Margin="0,2,0,0"
+                           FontFamily="Consolas" FontSize="12"/>
+                <TextBlock Text="拖动滑杆即可在 Rhino 视口实时预览；右侧数值框可直接输入精确值，两者双向同步。"
+                           TextWrapping="Wrap" Foreground="#666" FontSize="11" Margin="0,3,0,6"/>
+
+                <TextBlock Text="形状参数" FontWeight="Bold" FontSize="12" Foreground="#333" Margin="0,6,0,4"/>
+
+                <Grid Margin="0,2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="132"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="64"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="预设" VerticalAlignment="Center"/>
+                    <ComboBox x:Name="PresetBox" Grid.Column="1" Grid.ColumnSpan="2" SelectedIndex="0"
+                              SelectionChanged="OnPresetChanged" VerticalContentAlignment="Center">
+                        <ComboBoxItem Content="椭球（ε1=1, ε2=1）"/>
+                        <ComboBoxItem Content="长方体（ε1=0.15, ε2=0.15）"/>
+                        <ComboBoxItem Content="八面体（ε1=2, ε2=2）"/>
+                        <ComboBoxItem Content="枕形（ε1=0.5, ε2=0.5）"/>
+                    </ComboBox>
+                </Grid>
+
+                <Grid Margin="0,2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="132"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="64"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="半轴 a（x 方向）" VerticalAlignment="Center"/>
+                    <Slider x:Name="AxisASlider" Grid.Column="1" Minimum="0.01" Maximum="10" Value="1.0"
+                            Margin="6,0" VerticalAlignment="Center"/>
+                    <TextBox x:Name="AxisABox" Grid.Column="2" Text="1" VerticalContentAlignment="Center"/>
+                </Grid>
+
+                <Grid Margin="0,2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="132"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="64"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="半轴 b（y 方向）" VerticalAlignment="Center"/>
+                    <Slider x:Name="AxisBSlider" Grid.Column="1" Minimum="0.01" Maximum="10" Value="1.0"
+                            Margin="6,0" VerticalAlignment="Center"/>
+                    <TextBox x:Name="AxisBBox" Grid.Column="2" Text="1" VerticalContentAlignment="Center"/>
+                </Grid>
+
+                <Grid Margin="0,2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="132"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="64"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="半轴 c（z 方向）" VerticalAlignment="Center"/>
+                    <Slider x:Name="AxisCSlider" Grid.Column="1" Minimum="0.01" Maximum="10" Value="1.0"
+                            Margin="6,0" VerticalAlignment="Center"/>
+                    <TextBox x:Name="AxisCBox" Grid.Column="2" Text="1" VerticalContentAlignment="Center"/>
+                </Grid>
+
+                <Grid Margin="0,2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="132"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="64"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="形状指数 ε1（纵向）" VerticalAlignment="Center"/>
+                    <Slider x:Name="Eps1Slider" Grid.Column="1" Minimum="0.05" Maximum="4" Value="1.0"
+                            Margin="6,0" VerticalAlignment="Center"/>
+                    <TextBox x:Name="Eps1Box" Grid.Column="2" Text="1" VerticalContentAlignment="Center"/>
+                </Grid>
+
+                <Grid Margin="0,2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="132"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="64"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="形状指数 ε2（横向）" VerticalAlignment="Center"/>
+                    <Slider x:Name="Eps2Slider" Grid.Column="1" Minimum="0.05" Maximum="4" Value="1.0"
+                            Margin="6,0" VerticalAlignment="Center"/>
+                    <TextBox x:Name="Eps2Box" Grid.Column="2" Text="1" VerticalContentAlignment="Center"/>
+                </Grid>
+
+                <TextBlock Text="网格与位置" FontWeight="Bold" FontSize="12" Foreground="#333" Margin="0,10,0,4"/>
+
+                <Grid Margin="0,2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="132"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="64"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="网格分辨率 U（经向）" VerticalAlignment="Center"/>
+                    <Slider x:Name="SegUSlider" Grid.Column="1" Minimum="8" Maximum="256" Value="64"
+                            TickFrequency="8" IsSnapToTickEnabled="True" Margin="6,0" VerticalAlignment="Center"/>
+                    <TextBox x:Name="SegUBox" Grid.Column="2" Text="64" VerticalContentAlignment="Center"/>
+                </Grid>
+
+                <Grid Margin="0,2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="132"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="64"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="网格分辨率 V（纬向）" VerticalAlignment="Center"/>
+                    <Slider x:Name="SegVSlider" Grid.Column="1" Minimum="8" Maximum="256" Value="32"
+                            TickFrequency="8" IsSnapToTickEnabled="True" Margin="6,0" VerticalAlignment="Center"/>
+                    <TextBox x:Name="SegVBox" Grid.Column="2" Text="32" VerticalContentAlignment="Center"/>
+                </Grid>
+
+                <Grid Margin="0,2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="132"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="64"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="中心 X" VerticalAlignment="Center"/>
+                    <Slider x:Name="CenterXSlider" Grid.Column="1" Minimum="-10" Maximum="10" Value="0"
+                            Margin="6,0" VerticalAlignment="Center"/>
+                    <TextBox x:Name="CenterXBox" Grid.Column="2" Text="0" VerticalContentAlignment="Center"/>
+                </Grid>
+
+                <Grid Margin="0,2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="132"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="64"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="中心 Y" VerticalAlignment="Center"/>
+                    <Slider x:Name="CenterYSlider" Grid.Column="1" Minimum="-10" Maximum="10" Value="0"
+                            Margin="6,0" VerticalAlignment="Center"/>
+                    <TextBox x:Name="CenterYBox" Grid.Column="2" Text="0" VerticalContentAlignment="Center"/>
+                </Grid>
+
+                <Grid Margin="0,2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="132"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="64"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="中心 Z" VerticalAlignment="Center"/>
+                    <Slider x:Name="CenterZSlider" Grid.Column="1" Minimum="-10" Maximum="10" Value="0"
+                            Margin="6,0" VerticalAlignment="Center"/>
+                    <TextBox x:Name="CenterZBox" Grid.Column="2" Text="0" VerticalContentAlignment="Center"/>
+                </Grid>
+
+                <Grid Margin="0,2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="132"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="64"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="旋转 X（度）" VerticalAlignment="Center"/>
+                    <Slider x:Name="RotXSlider" Grid.Column="1" Minimum="-180" Maximum="180" Value="0"
+                            TickFrequency="5" IsSnapToTickEnabled="True" Margin="6,0" VerticalAlignment="Center"/>
+                    <TextBox x:Name="RotXBox" Grid.Column="2" Text="0" VerticalContentAlignment="Center"/>
+                </Grid>
+
+                <Grid Margin="0,2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="132"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="64"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="旋转 Y（度）" VerticalAlignment="Center"/>
+                    <Slider x:Name="RotYSlider" Grid.Column="1" Minimum="-180" Maximum="180" Value="0"
+                            TickFrequency="5" IsSnapToTickEnabled="True" Margin="6,0" VerticalAlignment="Center"/>
+                    <TextBox x:Name="RotYBox" Grid.Column="2" Text="0" VerticalContentAlignment="Center"/>
+                </Grid>
+
+                <Grid Margin="0,2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="132"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="64"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="旋转 Z（度）" VerticalAlignment="Center"/>
+                    <Slider x:Name="RotZSlider" Grid.Column="1" Minimum="-180" Maximum="180" Value="0"
+                            TickFrequency="5" IsSnapToTickEnabled="True" Margin="6,0" VerticalAlignment="Center"/>
+                    <TextBox x:Name="RotZBox" Grid.Column="2" Text="0" VerticalContentAlignment="Center"/>
+                </Grid>
+
+                <TextBlock Text="ε1 控制纵向（上下）饱满度，ε2 控制横向（水平截面）饱满度；ε→0 趋近盒状、ε=1 椭球、ε→2 趋近八面体。"
+                           TextWrapping="Wrap" Foreground="#666" FontSize="11" Margin="0,8,0,0"/>
+
+                <Border Background="#F2F7FF" BorderBrush="#C8DCF5" BorderThickness="1" Padding="8,6" Margin="0,8,0,0">
+                    <TextBlock Text="预览网格分辨率自动限制为 128×64 以保证拖动流畅；点「创建」时使用你设置的真实分辨率。"
+                               TextWrapping="Wrap" Foreground="#1F4E79" FontSize="11"/>
+                </Border>
+
+                <TextBlock x:Name="StatusText" Margin="0,8,0,4" Foreground="#0066CC" FontSize="11" TextWrapping="Wrap"/>
+            </StackPanel>
+        </ScrollViewer>
+
+        <StackPanel Grid.Row="1" Margin="14,8,14,12">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Text="布尔运算（先选中多个实体）：" VerticalAlignment="Center"/>
+                <Button Grid.Column="1" Content="交集" Click="OnBooleanIntersection" Padding="14,4" Margin="6,0,0,0"/>
+                <Button Grid.Column="2" Content="并集" Click="OnBooleanUnion" Padding="14,4" Margin="6,0,0,0"/>
+                <Button Grid.Column="3" Content="差集" Click="OnBooleanDifference" Padding="14,4" Margin="6,0,0,0"/>
+                <Button Grid.Column="4" Content="修复封闭" Click="OnRepairClosed" Padding="14,4" Margin="12,0,0,0"
+                        ToolTip="对当前选中的网格/曲面执行缝合、补洞与法线统一，尽量转为封闭实体"/>
+            </Grid>
+
+            <Grid Margin="0,10,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Text="创建方式：" VerticalAlignment="Center"/>
+                <ComboBox x:Name="OutputTypeBox" Grid.Column="1" Width="132" Margin="6,0,0,0"
+                          SelectedIndex="0" VerticalContentAlignment="Center">
+                    <ComboBoxItem Content="Mesh 网格"/>
+                    <ComboBoxItem Content="NURBS 曲面"/>
+                </ComboBox>
+
+                <Button Grid.Column="3" Content="创建" Click="OnCreate" Padding="18,5" Margin="0,0,8,0" FontWeight="Bold"/>
+                <Button Grid.Column="4" Content="关闭" Click="OnCancel" Padding="14,5"/>
+            </Grid>
+        </StackPanel>
+    </Grid>
+</Window>

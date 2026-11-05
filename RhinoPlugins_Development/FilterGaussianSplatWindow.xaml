@@ -1,0 +1,51 @@
+<Window x:Class="RhinoPlugins_Development.FilterGaussianSplatWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Filter Gaussian Splat（高斯椭球递归过滤）"
+        Width="440" SizeToContent="Height"
+        WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
+    <StackPanel Margin="14">
+        <TextBlock x:Name="SeedInfoText" FontWeight="Bold" Text="选中椭球" FontSize="14"/>
+        <StackPanel Orientation="Horizontal" Margin="0,6,0,2">
+            <Border x:Name="SeedColorSwatch" Width="52" Height="26"
+                    BorderBrush="#888" BorderThickness="1" Margin="0,0,10,0"
+                    Background="Gray" VerticalAlignment="Center"/>
+            <TextBlock x:Name="SeedColorText" VerticalAlignment="Center"/>
+        </StackPanel>
+        <TextBlock x:Name="SeedDetailText" TextWrapping="Wrap" Foreground="#444" Margin="0,2,0,10"/>
+
+        <Separator/>
+
+        <Grid Margin="0,12,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="150"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="30"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Text="颜色变化阈值 (0-100):" VerticalAlignment="Center"/>
+            <TextBox x:Name="ColorThresholdBox" Grid.Column="1" Text="15" VerticalContentAlignment="Center"/>
+
+            <TextBlock Text="搜索放大倍率 (≥1):" Grid.Row="1" VerticalAlignment="Center"/>
+            <TextBox x:Name="SearchMultiplierBox" Grid.Column="1" Grid.Row="1" Text="1.5" VerticalContentAlignment="Center"/>
+
+            <TextBlock Text="最低透明度 (0-1):" Grid.Row="2" VerticalAlignment="Center"/>
+            <TextBox x:Name="MinOpacityBox" Grid.Column="1" Grid.Row="2" Text="0.1" VerticalContentAlignment="Center"/>
+        </Grid>
+
+        <TextBlock Text="过滤：从选中椭球出发，放大后与相交且颜色/透明度满足条件的椭球递归扩散，仅显示结果。"
+                   TextWrapping="Wrap" Foreground="#666" FontSize="11" Margin="0,8,0,0"/>
+
+        <TextBlock x:Name="ResultText" Margin="0,10,0,0" FontWeight="Bold" Foreground="#0066CC" TextWrapping="Wrap"/>
+
+        <StackPanel Orientation="Horizontal" Margin="0,14,0,0" HorizontalAlignment="Right">
+            <Button Content="应用过滤" Click="OnApplyFilter" Padding="14,5" Margin="0,0,8,0"/>
+            <Button Content="恢复全部显示" Click="OnRestoreAll" Padding="14,5" Margin="0,0,8,0"/>
+            <Button Content="关闭" Click="OnClose" Padding="14,5"/>
+        </StackPanel>
+    </StackPanel>
+</Window>

@@ -1,0 +1,48 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	
+  <PropertyGroup>
+    <!-- Select the framework(s) you wish to target.
+        Rhino 6: net45
+        Rhino 7: net48
+        Rhino 8 Windows: net48, net7.0, net7.0-windows, net7.0-windows10.0.22000.0, etc
+        Rhino 8 Mac: net7.0, net7.0-macos, net7.0-macos12.0, etc
+        Rhino 9 Windows: net48, net8.0, net8.0-windows, net8.0-windows10.0.22000.0, etc
+        Rhino 9 Mac: net8.0, net8.0-macos, net8.0-macos12.0, etc
+    -->
+    <TargetFrameworks>net7.0-windows;net48</TargetFrameworks>
+    <EnableDynamicLoading>true</EnableDynamicLoading>
+    <TargetExt>.rhp</TargetExt>
+    <NoWarn>NU1701</NoWarn>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <!-- 统一编译输出地址：bin\debug（Debug/Release 一致，不含 TFM 子目录） -->
+    <OutputPath>bin\debug\</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+  </PropertyGroup>
+  
+  <!-- 统一输出 bin\debug 时，两个目标框架必须使用独立的中 obj 目录，否则互相覆盖生成文件 -->
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net48'">
+    <IntermediateOutputPath>obj\debug_net48\</IntermediateOutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net7.0-windows'">
+    <IntermediateOutputPath>obj\debug_net7\</IntermediateOutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- Specifies information for Assembly and Yak -->
+    <Version>1.0</Version> <!-- Sets the Yak Version Attribute -->
+    <Title>RhinoPlugins_Development</Title>
+    <Company>RhinoPlugins_Development Authors</Company><!-- Sets the Yak Author Attribute -->
+    <Description>Description of RhinoPlugins_Development</Description><!-- Sets the Yak Description Attribute -->
+    <!--<AssemblyName>RhinoPlugins_Development</AssemblyName>--><!-- Sets the Yak Name Attribute -->
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="RhinoCommon" Version="8.0.23304.9001" ExcludeAssets="runtime" />
+  </ItemGroup>
+  
+  <!-- For Windows only builds -->
+  <PropertyGroup Condition="$(TargetFramework.Contains('-windows')) or $(TargetFramework.StartsWith('net4'))">
+    <UseWpf>true</UseWpf>
+  </PropertyGroup>
+
+</Project>

@@ -1,0 +1,32 @@
+# Visual Studio 工作区与个人设置
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.VC.db
+*.VC.opendb
+
+# 构建输出
+bin/
+obj/
+[Dd]ebug*/
+[Rr]elease*/
+x64/
+x86/
+
+# Rhino 插件二进制
+*.rhp
+*.pdb
+*.deps.json
+*.runtimeconfig.json
+
+# NuGet 还原产物
+packages/
+*.nupkg
+
+# 日志与临时文件
+*.log
+log.txt
+*.tmp
+*.bak
